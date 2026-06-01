@@ -1,0 +1,28 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="NvL2R-mVnYNNDlfnthWi">
+    <mxGraphModel dx="828" dy="488" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="1cQsujq0v7uPVdUJo96a-1" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Agricultor" vertex="1">
+          <mxGeometry height="40" width="100" x="96" y="247" as="geometry" />
+        </mxCell>
+        <mxCell id="1cQsujq0v7uPVdUJo96a-2" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Alertas" vertex="1">
+          <mxGeometry height="40" width="100" x="507" y="247" as="geometry" />
+        </mxCell>
+        <mxCell id="1cQsujq0v7uPVdUJo96a-5" edge="1" parent="1" source="1cQsujq0v7uPVdUJo96a-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;" target="1cQsujq0v7uPVdUJo96a-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1cQsujq0v7uPVdUJo96a-3" parent="1" style="shape=rhombus;perimeter=rhombusPerimeter;whiteSpace=wrap;html=1;align=center;" value="Recebe/Envia" vertex="1">
+          <mxGeometry height="60" width="120" x="294" y="237" as="geometry" />
+        </mxCell>
+        <mxCell id="1cQsujq0v7uPVdUJo96a-4" edge="1" parent="1" source="1cQsujq0v7uPVdUJo96a-1" style="endArrow=none;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="1cQsujq0v7uPVdUJo96a-3" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="313" y="312" as="sourcePoint" />
+            <mxPoint x="473" y="312" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
