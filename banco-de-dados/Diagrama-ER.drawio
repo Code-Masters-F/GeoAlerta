@@ -98,7 +98,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="vksxoiG0gUfaOYFF6IOz" name="ER Lógico">
-    <mxGraphModel dx="1201" dy="702" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1334" dy="786" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -385,7 +385,7 @@
             <mxPoint x="-3" y="-13" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="LbYDO3tO7f_wfHDM73mW-25" edge="1" parent="1" source="LbYDO3tO7f_wfHDM73mW-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="yEAQWjf2RzAZvzXmho5V-11">
+        <mxCell id="LbYDO3tO7f_wfHDM73mW-25" edge="1" parent="1" source="LbYDO3tO7f_wfHDM73mW-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="lKgnqlH9FUWco_MODLHI-6" connectable="0" parent="LbYDO3tO7f_wfHDM73mW-25" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="(1, 1)" vertex="1">
@@ -428,7 +428,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="xPd0hq3Cvx53CvInlPa-" name="Dicionário de dados">
-    <mxGraphModel dx="1716" dy="1003" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1716" dy="1010" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -473,7 +473,7 @@
             <mxRectangle height="61" width="129" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="E2vlRM3lV1OitIhckw7I-4" parent="E2vlRM3lV1OitIhckw7I-2" style="connectable=0;recursiveResize=0;strokeColor=inherit;fillColor=none;align=center;whiteSpace=wrap;html=1;" value="VARCHAR(30)" vertex="1">
+        <mxCell id="E2vlRM3lV1OitIhckw7I-4" parent="E2vlRM3lV1OitIhckw7I-2" style="connectable=0;recursiveResize=0;strokeColor=inherit;fillColor=none;align=center;whiteSpace=wrap;html=1;" value="VARCHAR(60)" vertex="1">
           <mxGeometry height="61" width="99" x="129" as="geometry">
             <mxRectangle height="61" width="99" as="alternateBounds" />
           </mxGeometry>
@@ -737,7 +737,7 @@
             <mxRectangle height="61" width="106" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="laBp_DQxmJX18aNkerVR-5" parent="laBp_DQxmJX18aNkerVR-3" style="connectable=0;recursiveResize=0;strokeColor=inherit;fillColor=none;align=center;whiteSpace=wrap;html=1;" value="VARCHAR(30)" vertex="1">
+        <mxCell id="laBp_DQxmJX18aNkerVR-5" parent="laBp_DQxmJX18aNkerVR-3" style="connectable=0;recursiveResize=0;strokeColor=inherit;fillColor=none;align=center;whiteSpace=wrap;html=1;" value="VARCHAR(60)" vertex="1">
           <mxGeometry height="61" width="99" x="106" as="geometry">
             <mxRectangle height="61" width="99" as="alternateBounds" />
           </mxGeometry>
@@ -755,7 +755,7 @@
             <mxRectangle height="60" width="106" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="laBp_DQxmJX18aNkerVR-9" parent="laBp_DQxmJX18aNkerVR-7" style="connectable=0;recursiveResize=0;strokeColor=inherit;fillColor=none;align=center;whiteSpace=wrap;html=1;" value="VARCHAR(30)" vertex="1">
+        <mxCell id="laBp_DQxmJX18aNkerVR-9" parent="laBp_DQxmJX18aNkerVR-7" style="connectable=0;recursiveResize=0;strokeColor=inherit;fillColor=none;align=center;whiteSpace=wrap;html=1;" value="VARCHAR(255)" vertex="1">
           <mxGeometry height="60" width="99" x="106" as="geometry">
             <mxRectangle height="60" width="99" as="alternateBounds" />
           </mxGeometry>
