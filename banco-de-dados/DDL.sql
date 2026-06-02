@@ -1,11 +1,14 @@
 CREATE TABLE EmpresaAgricola (
-    CNPJ          VARCHAR(14)  NOT NULL,
+    CNPJ          CHAR(14)     NOT NULL,
     NomeFantasia  VARCHAR(60)  NOT NULL,
     email         VARCHAR(255) NOT NULL,
     senha_hash    VARCHAR(255) NOT NULL,
     CONSTRAINT pk_empresa_agricola PRIMARY KEY (CNPJ),
-    CONSTRAINT uq_empresa_email    UNIQUE (email)
+    CONSTRAINT ck_empresa_cnpj_formato CHECK (CNPJ ~ '^[0-9]{14}$')
 );
+
+CREATE UNIQUE INDEX uq_empresa_agricola_email_ci
+    ON EmpresaAgricola (LOWER(email));
 
 CREATE TABLE Alertas (
     ID              INT          GENERATED ALWAYS AS IDENTITY,
@@ -19,7 +22,7 @@ CREATE TABLE Alertas (
 
 CREATE TABLE Enderecos (
     ID            INT         GENERATED ALWAYS AS IDENTITY,
-    CNPJ          VARCHAR(14) NOT NULL,
+    CNPJ          CHAR(14)    NOT NULL,
     ERD_PlusCode  VARCHAR(11) NOT NULL,
     CONSTRAINT pk_enderecos PRIMARY KEY (ID),
     CONSTRAINT fk_enderecos_empresa FOREIGN KEY (CNPJ)
@@ -36,7 +39,7 @@ CREATE TABLE RegioesAfetadas (
 );
 
 CREATE TABLE NotificacoesRecebidas (
-    CNPJ       VARCHAR(14) NOT NULL,
+    CNPJ       CHAR(14)    NOT NULL,
     Alertas_ID INT         NOT NULL,
     CONSTRAINT pk_notificacoes_recebidas PRIMARY KEY (CNPJ, Alertas_ID),
     CONSTRAINT fk_notificacoes_empresa FOREIGN KEY (CNPJ)
