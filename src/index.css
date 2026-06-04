@@ -1,0 +1,233 @@
+@import "tailwindcss";
+
+/*
+  GeoAlerta — Design System
+  Estilo: Organic Biophilic premium para o agronegocio.
+  Cor: earth-green profundo + acento harvest-gold (unico sinal premium).
+  Tipografia: Montserrat (display) + Inter (corpo), figuras tabulares nos dados.
+*/
+
+@theme {
+  /* ---------- Marca / verde ---------- */
+  --color-primary: #166534;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #15803d;
+  --color-on-primary-container: #14532d;
+  --color-primary-fixed: #dceccd;
+  --color-primary-fixed-dim: #bcd6a6;
+  --color-on-primary-fixed: #0b2818;
+  --color-on-primary-fixed-variant: #2f5233;
+  --color-inverse-primary: #bbf7d0;
+
+  --color-secondary: #15803d;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #15803d;
+  --color-on-secondary-container: #ffffff;
+  --color-secondary-fixed: #dceccd;
+  --color-secondary-fixed-dim: #bcd6a6;
+  --color-on-secondary-fixed: #0b2818;
+  --color-on-secondary-fixed-variant: #2f5233;
+
+  --color-tertiary: #4d7c0f;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #1a2e1f;
+  --color-on-tertiary-container: #5a6b54;
+  --color-tertiary-fixed: #f7faf5;
+  --color-tertiary-fixed-dim: #aebfa3;
+  --color-on-tertiary-fixed: #14271a;
+  --color-on-tertiary-fixed-variant: #5a6b54;
+
+  /* ---------- Acento premium (harvest gold) ---------- */
+  --color-cta: #ca8a04;
+  --color-cta-hover: #a16207;
+  --color-on-cta: #ffffff;
+  --color-cta-soft: #fef3c7;
+
+  /* ---------- Superficies ---------- */
+  --color-background: #f6f8f4;
+  --color-on-background: #14271a;
+  --color-surface: #f6f8f4;
+  --color-on-surface: #14271a;
+  --color-surface-bright: #ffffff;
+  --color-surface-dim: #e2ead8;
+  --color-surface-tint: #15803d;
+  --color-surface-variant: #f1f5ec;
+  --color-on-surface-variant: #57684f;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f1f5ec;
+  --color-surface-container: #eaf0e2;
+  --color-surface-container-high: #e2ead8;
+  --color-surface-container-highest: #dae4ce;
+  --color-inverse-surface: #14271a;
+  --color-inverse-on-surface: #f3f7ee;
+
+  --color-outline: #8fa384;
+  --color-outline-variant: #dde5d4;
+
+  /* ---------- Semanticas de risco / feedback ---------- */
+  --color-error: #dc2626;
+  --color-on-error: #ffffff;
+  --color-error-container: #fee2e2;
+  --color-on-error-container: #991b1b;
+
+  --color-warning: #d97706;
+  --color-on-warning: #ffffff;
+  --color-warning-container: #fef3c7;
+  --color-on-warning-container: #92400e;
+
+  --color-info: #2563eb;
+  --color-on-info: #ffffff;
+  --color-info-container: #dbeafe;
+  --color-on-info-container: #1e40af;
+
+  --color-success: #16a34a;
+  --color-on-success: #ffffff;
+  --color-success-container: #dcfce7;
+  --color-on-success-container: #166534;
+
+  /* ---------- Atalhos legados usados no markup ---------- */
+  --color-agro-dark: #0b2818;
+  --color-agro-green: #15803d;
+  --color-agro-light: #f6f8f4;
+  --color-agro-accent: #57684f;
+
+  /* ---------- Tipografia: familias ---------- */
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-display: Montserrat, sans-serif;
+  --font-display-lg: Montserrat, sans-serif;
+  --font-display-lg-mobile: Montserrat, sans-serif;
+  --font-headline-md: Montserrat, sans-serif;
+  --font-body-lg: Inter, sans-serif;
+  --font-body-md: Inter, sans-serif;
+  --font-label-caps: Inter, sans-serif;
+  --font-data-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* ---------- Tipografia: escalas ---------- */
+  --text-display-lg: 3.25rem;
+  --text-display-lg--line-height: 1.05;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 700;
+
+  --text-display-lg-mobile: 2rem;
+  --text-display-lg-mobile--line-height: 1.1;
+  --text-display-lg-mobile--letter-spacing: -0.01em;
+  --text-display-lg-mobile--font-weight: 700;
+
+  --text-headline-md: 1.5rem;
+  --text-headline-md--line-height: 1.2;
+  --text-headline-md--letter-spacing: -0.01em;
+  --text-headline-md--font-weight: 700;
+
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.6;
+
+  --text-body-md: 1rem;
+  --text-body-md--line-height: 1.6;
+
+  --text-label-caps: 0.6875rem;
+  --text-label-caps--line-height: 1.3;
+  --text-label-caps--letter-spacing: 0.08em;
+  --text-label-caps--font-weight: 700;
+
+  --text-data-mono: 0.875rem;
+  --text-data-mono--line-height: 1.4;
+
+  /* ---------- Espacamento ---------- */
+  --spacing-base-unit: 8px;
+  --spacing-touch-target-min: 44px;
+  --spacing-margin-desktop: 48px;
+  --spacing-margin-mobile: 16px;
+  --spacing-container-max: 1280px;
+  --spacing-gutter: 24px;
+
+  /* ---------- Sombras (Organic Biophilic) ---------- */
+  --shadow-soft: 0 1px 2px rgba(11, 40, 24, 0.04), 0 4px 16px rgba(11, 40, 24, 0.06);
+  --shadow-card: 0 2px 8px rgba(11, 40, 24, 0.05), 0 12px 28px rgba(11, 40, 24, 0.07);
+  --shadow-lift: 0 8px 24px rgba(11, 40, 24, 0.1), 0 24px 48px rgba(11, 40, 24, 0.1);
+  --shadow-gold: 0 8px 24px rgba(202, 138, 4, 0.28);
+}
+
+/* ============ Base ============ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+}
+
+/* Figuras tabulares em dados numericos */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* ============ Componentes utilitarios ============ */
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(221, 229, 212, 0.7);
+  box-shadow: var(--shadow-soft);
+}
+
+.shadow-soft { box-shadow: var(--shadow-soft); }
+.shadow-card { box-shadow: var(--shadow-card); }
+.shadow-lift { box-shadow: var(--shadow-lift); }
+.shadow-tinted { box-shadow: var(--shadow-card); }
+.shadow-gold { box-shadow: var(--shadow-gold); }
+
+/* Glow de foco verde para inputs (acessivel) */
+.input-focus-glow:focus {
+  outline: none;
+  border-color: var(--color-primary-container);
+  box-shadow: 0 0 0 4px rgba(21, 128, 61, 0.14);
+}
+
+/* Marcadores de risco pulsantes no mapa */
+.pulse-marker-critical {
+  animation: pulse-critical 2s infinite;
+}
+
+@keyframes pulse-critical {
+  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6); }
+  70% { box-shadow: 0 0 0 16px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
+.pulse-marker-warning {
+  animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-warning {
+  0% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.6); }
+  70% { box-shadow: 0 0 0 12px rgba(217, 119, 6, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
+}
+
+/* Fundo do mapa */
+.map-bg {
+  background-color: #18261c;
+  background-image: linear-gradient(rgba(11, 40, 24, 0.35), rgba(11, 40, 24, 0.55)),
+    url('https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2000&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+}
+
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+
+/* Respeita preferencia de movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
