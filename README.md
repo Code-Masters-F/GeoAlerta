@@ -1,4 +1,4 @@
-# GeoAlerta
+# GeoAlerta - Global Solution 2026
 
 Plataforma B2B de monitoramento de risco climatico e agricola para o agronegocio
 brasileiro. Acompanha propriedades em tempo real e emite alertas sobre secas,
