@@ -44,7 +44,7 @@ private data class Probabilidade(val nome: String, val valor: Int, val color: Co
 
 @Composable
 fun DashboardView(navController: NavController) {
-    val repo = MockRepository()
+    val repo = MockRepository
     val propriedades = repo.getProperties()
     val alertas = repo.getAlerts()
 
@@ -280,7 +280,7 @@ private fun RiskBar(nome: String, valor: Int, color: Color) {
     var iniciado by remember { mutableStateOf(reduced) }
     LaunchedEffect(Unit) { iniciado = true }
     val progresso by animateFloatAsState(
-        targetValue = if (iniciado) valor / 100f else 0f,
+        targetValue = if (iniciado) (valor / 100f).coerceIn(0f, 1f) else 0f,
         animationSpec = tween(durationMillis = 700),
         label = "riskProgress"
     )

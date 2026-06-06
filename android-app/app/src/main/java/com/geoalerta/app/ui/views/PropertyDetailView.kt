@@ -28,7 +28,7 @@ import com.geoalerta.app.models.RiskLevel
  */
 @Composable
 fun PropertyDetailView(navController: NavController, propertyId: String?) {
-    val prop = MockRepository().getProperties().firstOrNull { it.id == propertyId }
+    val prop = MockRepository.getProperties().firstOrNull { it.id == propertyId }
 
     DetailScaffold(title = prop?.name ?: "Propriedade", navController = navController) { padding ->
         if (prop == null) {

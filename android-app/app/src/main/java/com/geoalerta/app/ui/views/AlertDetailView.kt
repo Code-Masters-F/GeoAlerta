@@ -26,7 +26,7 @@ import com.geoalerta.app.models.MockRepository
  */
 @Composable
 fun AlertDetailView(navController: NavController, alertId: String?) {
-    val repo = MockRepository()
+    val repo = MockRepository
     val alert = repo.getAlerts().firstOrNull { it.id == alertId }
     val propriedade = alert?.let { a -> repo.getProperties().firstOrNull { it.id == a.propertyId } }
 

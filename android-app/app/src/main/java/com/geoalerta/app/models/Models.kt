@@ -25,7 +25,7 @@ enum class AlertType {
     DROUGHT, EXCESS_RAIN, FROST, FIRE, PESTS
 }
 
-class MockRepository {
+object MockRepository {
     fun getProperties(): List<Property> {
         return listOf(
             Property("1", "Fazenda Bela Vista", "Mato Grosso", RiskLevel.MEDIUM, "Hoje, 10:00"),

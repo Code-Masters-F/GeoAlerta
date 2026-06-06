@@ -112,7 +112,10 @@ fun GeoAlertaScaffold(
                             if (currentRoute != item.route) {
                                 navController.navigate(item.route) {
                                     launchSingleTop = true
-                                    popUpTo("dashboard")
+                                    restoreState = true
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
                                 }
                             }
                         },

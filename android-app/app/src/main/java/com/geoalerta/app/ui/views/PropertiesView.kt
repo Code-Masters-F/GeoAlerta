@@ -29,7 +29,7 @@ import com.geoalerta.app.models.Property
  */
 @Composable
 fun PropertiesView(navController: NavController) {
-    val propriedades = MockRepository().getProperties()
+    val propriedades = MockRepository.getProperties()
 
     GeoAlertaScaffold(navController) { padding ->
         LazyColumn(
@@ -75,6 +75,7 @@ fun PropertiesView(navController: NavController) {
             item {
                 Button(
                     onClick = { },
+                    enabled = false, // Em construcao
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
@@ -82,13 +83,13 @@ fun PropertiesView(navController: NavController) {
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Adicionar Propriedade", fontWeight = FontWeight.SemiBold)
+                    Text("Adicionar Propriedade (Em breve)", fontWeight = FontWeight.SemiBold)
                 }
             }
 
             itemsIndexed(propriedades) { index, prop ->
                 StaggeredItem(index) {
-                    PropertyCard(prop, onClick = { navController.navigate("detalhe/${prop.id}") })
+                    PropertyCard(prop, onClick = { navController.navigate("detalhe/${android.net.Uri.encode(prop.id)}") })
                 }
             }
         }

@@ -6,11 +6,14 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
-// Le a chave do Maps de local.properties (gitignored), mantendo-a fora do versionamento.
 val mapsApiKey: String = Properties().apply {
     val file = rootProject.file("local.properties")
     if (file.exists()) file.inputStream().use { load(it) }
 }.getProperty("MAPS_API_KEY", "")
+
+if (mapsApiKey.isBlank() && gradle.startParameter.taskNames.any { it.contains("Release", ignoreCase = true) }) {
+    throw GradleException("MAPS_API_KEY is required for release builds. Please set it in local.properties.")
+}
 
 android {
     namespace = "com.geoalerta.app"
@@ -28,7 +31,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }

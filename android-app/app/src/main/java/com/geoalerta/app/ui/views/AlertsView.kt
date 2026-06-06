@@ -28,7 +28,7 @@ import com.geoalerta.app.models.MockRepository
  */
 @Composable
 fun AlertsView(navController: NavController) {
-    val alertas = MockRepository().getAlerts()
+    val alertas = MockRepository.getAlerts()
 
     DetailScaffold(title = "Alertas Ativos", navController = navController) { padding ->
         LazyColumn(
@@ -38,7 +38,7 @@ fun AlertsView(navController: NavController) {
         ) {
             item {
                 Text(
-                    "${alertas.size} alertas nas ultimas 24h",
+                    "${alertas.size} alertas ativos",
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

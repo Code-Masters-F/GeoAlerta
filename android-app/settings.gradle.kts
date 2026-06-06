@@ -21,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "GeoAlerta"
 include(":app")
-include(":app")

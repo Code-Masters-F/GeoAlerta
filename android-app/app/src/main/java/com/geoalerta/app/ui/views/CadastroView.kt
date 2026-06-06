@@ -31,6 +31,8 @@ fun CadastroView(navController: NavController) {
     var mostrarSenha by remember { mutableStateOf(false) }
     var aceitouTermos by remember { mutableStateOf(false) }
 
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -119,10 +121,27 @@ fun CadastroView(navController: NavController) {
             )
         }
 
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage!!,
+                color = MaterialTheme.colorScheme.error,
+                fontSize = 14.sp,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        }
+
         Button(
             onClick = {
-                navController.navigate("dashboard") {
-                    popUpTo("login") { inclusive = true }
+                if (nome.isBlank() || email.isBlank() || senha.isBlank()) {
+                    errorMessage = "Preencha todos os campos obrigatórios."
+                } else if (senha != confirmar) {
+                    errorMessage = "As senhas não coincidem."
+                } else {
+                    errorMessage = null
+                    navController.navigate("dashboard") {
+                        popUpTo("login") { inclusive = true }
+                    }
                 }
             },
             enabled = aceitouTermos,

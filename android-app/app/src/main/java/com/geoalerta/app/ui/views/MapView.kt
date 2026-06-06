@@ -193,7 +193,7 @@ fun MapView(navController: NavController) {
                 PropertyDetailPanel(
                     modifier = Modifier.padding(16.dp),
                     onClose = { painelVisivel = false },
-                    onVerDetalhes = { navController.navigate("detalhe/3") }
+                    onVerDetalhes = { navController.navigate("detalhe/${android.net.Uri.encode("3")}") }
                 )
             }
         }
@@ -296,8 +296,8 @@ private fun PropertyDetailPanel(modifier: Modifier = Modifier, onClose: () -> Un
                     ) {
                         Text("Ver Detalhes", fontWeight = FontWeight.SemiBold)
                     }
-                    OutlinedIconButton(onClick = { }) {
-                        Icon(Icons.Filled.Share, contentDescription = "Compartilhar")
+                    OutlinedIconButton(onClick = { }, enabled = false) {
+                        Icon(Icons.Filled.Share, contentDescription = "Compartilhar (Em breve)")
                     }
                 }
             }

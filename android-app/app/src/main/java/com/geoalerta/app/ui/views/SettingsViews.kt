@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 
 /** Bloco de cartão branco usado pelas subtelas de configurações. */
 @Composable
@@ -46,6 +47,8 @@ private fun ToggleRow(titulo: String, subtitulo: String, checked: Boolean, onCha
 fun ContaView(navController: NavController) {
     var email by remember { mutableStateOf("roberto@fazendapalmares.com.br") }
     var cnpj by remember { mutableStateOf("12.345.678/0001-90") }
+    val scope = rememberCoroutineScope()
+    var isSaving by remember { mutableStateOf(false) }
 
     DetailScaffold("Conta", navController) { padding ->
         Column(
@@ -64,8 +67,14 @@ fun ContaView(navController: NavController) {
             OutlinedButton(onClick = { }, modifier = Modifier.fillMaxWidth()) {
                 Text("Alterar senha")
             }
-            Button(onClick = { navController.popBackStack() }, modifier = Modifier.fillMaxWidth().height(50.dp)) {
-                Text("Salvar alterações", fontWeight = FontWeight.SemiBold)
+            Button(onClick = {
+                isSaving = true
+                scope.launch {
+                    kotlinx.coroutines.delay(500)
+                    navController.popBackStack()
+                }
+            }, enabled = !isSaving, modifier = Modifier.fillMaxWidth().height(50.dp)) {
+                Text(if (isSaving) "Salvando..." else "Salvar alterações", fontWeight = FontWeight.SemiBold)
             }
         }
     }
@@ -142,7 +151,7 @@ fun IdiomaView(navController: NavController) {
 
     DetailScaffold("Idioma e Região", navController) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+            modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text("Idioma do aplicativo", fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
@@ -177,7 +186,7 @@ fun AjudaView(navController: NavController) {
     )
     DetailScaffold("Ajuda e Suporte", navController) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+            modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             SettingsCard {

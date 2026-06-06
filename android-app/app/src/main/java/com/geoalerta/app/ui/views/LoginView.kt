@@ -17,6 +17,7 @@ fun LoginView(navController: NavController) {
     var cnpj by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -74,8 +75,26 @@ fun LoginView(navController: NavController) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage!!,
+                color = MaterialTheme.colorScheme.error,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
+
         Button(
-            onClick = { navController.navigate("dashboard") },
+            onClick = {
+                if (cnpj.isBlank() || password.isBlank()) {
+                    errorMessage = "Preencha CNPJ e Senha."
+                } else {
+                    errorMessage = null
+                    navController.navigate("dashboard") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
