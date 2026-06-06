@@ -1,6 +1,0 @@
-{
-  "name": "GeoAlerta",
-  "description": "GeoAlerta monitora sua propriedade em tempo real e envia alertas precisos sobre riscos climáticos, pragas e desastres.",
-  "requestFramePermissions": [],
-  "majorCapabilities": []
-}
