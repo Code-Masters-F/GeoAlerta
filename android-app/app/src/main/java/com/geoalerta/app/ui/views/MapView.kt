@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.geoalerta.app.models.MockRepository
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -65,8 +66,6 @@ private val areaAgricola = listOf(
     LatLng(-21.4600, -45.4585),
     LatLng(-21.4535, -45.4640)
 )
-
-import com.geoalerta.app.models.MockRepository
 
 @Composable
 fun MapView(navController: NavController, propertyId: String? = null) {
