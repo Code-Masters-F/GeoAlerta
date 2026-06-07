@@ -72,8 +72,14 @@ class MainActivity : ComponentActivity() {
                         composable("dashboard") {
                             DashboardView(navController)
                         }
-                        composable("mapa") {
-                            MapView(navController)
+                        composable(
+                            route = "mapa?propertyId={propertyId}",
+                            arguments = listOf(navArgument("propertyId") {
+                                type = NavType.StringType
+                                nullable = true
+                            })
+                        ) { entry ->
+                            MapView(navController, entry.arguments?.getString("propertyId"))
                         }
                         composable("propriedades") {
                             PropertiesView(navController)
