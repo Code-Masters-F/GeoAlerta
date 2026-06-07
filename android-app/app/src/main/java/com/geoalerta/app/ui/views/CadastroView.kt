@@ -1,5 +1,6 @@
 package com.geoalerta.app.ui.views
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -9,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -16,7 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-
+import com.geoalerta.app.R
 /**
  * Cadastro de empresa. Espelha `CadastroPage.jsx`: formulário com nome, CNPJ,
  * e-mail, senha e confirmação, aceite de termos e submit que leva ao dashboard.
@@ -48,11 +50,12 @@ fun CadastroView(navController: NavController) {
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-            Text(
-                "GeoAlerta",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+            Image(
+                painter = painterResource(id = R.drawable.geoalerta_logo),
+                contentDescription = "Logo GeoAlerta",
+                modifier = Modifier
+                    .height(60.dp)
+                    .padding(bottom = 8.dp)
             )
             Spacer(Modifier.height(8.dp))
             Text("Cadastre sua empresa", fontSize = 22.sp, fontWeight = FontWeight.SemiBold)

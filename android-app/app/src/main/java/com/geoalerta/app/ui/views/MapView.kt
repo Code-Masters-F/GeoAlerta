@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.geoalerta.app.models.MockRepository
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -67,9 +68,15 @@ private val areaAgricola = listOf(
 )
 
 @Composable
-fun MapView(navController: NavController) {
+fun MapView(navController: NavController, propertyId: String? = null) {
     var painelVisivel by remember { mutableStateOf(true) }
     val reduced = rememberReducedMotion()
+    
+    val prop = propertyId?.let { id -> MockRepository.getProperties().firstOrNull { it.id == id } }
+    val mapTitle = prop?.name ?: "Fazenda Bela Vista" // Fallback to first property name
+    val mapLocation = prop?.location ?: "Mato Grosso"
+    val areaTotal = when(prop?.id) { "1" -> "1.250 ha"; "2" -> "640 ha"; "3" -> "2.100 ha"; else -> "900 ha" }
+    val culturaAtual = when(prop?.id) { "1" -> "Soja (V6)"; "2" -> "Milho"; "3" -> "Algodão"; else -> "Pastagem" }
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(fazendaCentro, 14.2f)
@@ -121,22 +128,22 @@ fun MapView(navController: NavController) {
 
                 Marker(
                     state = MarkerState(position = LatLng(-21.4505, -45.4595)),
-                    title = "Stress Hidrico Severo",
+                    title = "Falta de água grave",
                     snippet = "Zona A - 320 ha afetados",
                     icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
                     onClick = { painelVisivel = true; false }
                 )
                 Marker(
                     state = MarkerState(position = LatLng(-21.4560, -45.4515)),
-                    title = "Anomalia de Biomassa",
-                    snippet = "Zona C - queda de 15% NDVI",
+                    title = "Baixo desenvolvimento das plantas",
+                    snippet = "Zona C - Atenção",
                     icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE),
                     onClick = { painelVisivel = true; false }
                 )
                 Marker(
                     state = MarkerState(position = fazendaCentro),
-                    title = "Fazenda Otor",
-                    snippet = "Sede - Soja (V6)",
+                    title = mapTitle,
+                    snippet = "Sede - $culturaAtual",
                     onClick = { painelVisivel = true; false }
                 )
             }
@@ -192,8 +199,12 @@ fun MapView(navController: NavController) {
             ) {
                 PropertyDetailPanel(
                     modifier = Modifier.padding(16.dp),
+                    mapTitle = mapTitle,
+                    mapLocation = mapLocation,
+                    areaTotal = areaTotal,
+                    culturaAtual = culturaAtual,
                     onClose = { painelVisivel = false },
-                    onVerDetalhes = { navController.navigate("detalhe/${android.net.Uri.encode("3")}") }
+                    onVerDetalhes = { navController.navigate("detalhe/${android.net.Uri.encode(prop?.id ?: "1")}") }
                 )
             }
         }
@@ -244,7 +255,15 @@ private fun ScanSweep(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun PropertyDetailPanel(modifier: Modifier = Modifier, onClose: () -> Unit, onVerDetalhes: () -> Unit) {
+private fun PropertyDetailPanel(
+    modifier: Modifier = Modifier, 
+    mapTitle: String,
+    mapLocation: String,
+    areaTotal: String,
+    culturaAtual: String,
+    onClose: () -> Unit, 
+    onVerDetalhes: () -> Unit
+) {
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -264,11 +283,11 @@ private fun PropertyDetailPanel(modifier: Modifier = Modifier, onClose: () -> Un
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        Text("Fazenda Otor", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(mapTitle, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             Icon(Icons.Filled.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(16.dp))
                             Text(
-                                "Vale do Rio Verde, MG",
+                                mapLocation,
                                 fontSize = 13.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -280,13 +299,13 @@ private fun PropertyDetailPanel(modifier: Modifier = Modifier, onClose: () -> Un
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    InfoTile("AREA TOTAL", "1.250 ha", Modifier.weight(1f))
-                    InfoTile("CULTURA ATUAL", "Soja (V6)", Modifier.weight(1f))
+                    InfoTile("ÁREA TOTAL", areaTotal, Modifier.weight(1f))
+                    InfoTile("CULTURA ATUAL", culturaAtual, Modifier.weight(1f))
                 }
 
                 Text("RISCOS ATIVOS", fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-                ActiveRisk("Stress Hidrico Severo", "Zona A (320 ha afetados)", "CRITICO", RiskColors.Critical)
-                ActiveRisk("Anomalia de Biomassa", "Zona C (Queda de 15% NDVI)", "ATENCAO", RiskColors.Medium)
+                ActiveRisk("Falta de água grave", "Zona A (320 ha afetados)", "CRÍTICO", RiskColors.Critical)
+                ActiveRisk("Baixo desenvolvimento das plantas", "Zona C (Atenção)", "ATENÇÃO", RiskColors.Medium)
 
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Button(

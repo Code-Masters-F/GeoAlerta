@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
@@ -41,13 +42,21 @@ fun PropertiesView(navController: NavController) {
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             item {
-                Column {
-                    Text("Suas Propriedades", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                    Text(
-                        "${propriedades.size} propriedades monitoradas em tempo real",
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Icon(androidx.compose.material.icons.Icons.Filled.ArrowBack, contentDescription = "Voltar")
+                    }
+                    Column {
+                        Text("Suas Propriedades", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            "${propriedades.size} propriedades monitoradas em tempo real",
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
 

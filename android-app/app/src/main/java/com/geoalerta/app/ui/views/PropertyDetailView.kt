@@ -82,7 +82,7 @@ fun PropertyDetailView(navController: NavController, propertyId: String?) {
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 DetailTile("TALHÕES", "12", Modifier.weight(1f))
-                DetailTile("NDVI MÉDIO", "0.68", Modifier.weight(1f))
+                DetailTile("SAÚDE DAS PLANTAS", "Boa (0.68)", Modifier.weight(1f))
             }
 
             // Riscos ativos
@@ -93,7 +93,7 @@ fun PropertyDetailView(navController: NavController, propertyId: String?) {
 
             // Acoes
             Button(
-                onClick = { navController.navigate("mapa") },
+                onClick = { navController.navigate("mapa?propertyId=${prop.id}") },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -170,8 +170,8 @@ private fun culturaFor(p: Property): String = when (p.id) {
 
 private fun risksFor(p: Property): List<Triple<String, String, RiskLevel>> = when (p.riskLevel) {
     RiskLevel.CRITICAL, RiskLevel.HIGH -> listOf(
-        Triple("Stress Hídrico Severo", "Zona A (320 ha afetados)", RiskLevel.CRITICAL),
-        Triple("Anomalia de Biomassa", "Zona C (queda de 15% NDVI)", RiskLevel.MEDIUM)
+        Triple("Falta de água grave", "Zona A (320 ha afetados)", RiskLevel.CRITICAL),
+        Triple("Baixo desenvolvimento das plantas", "Zona C (Atenção)", RiskLevel.MEDIUM)
     )
     RiskLevel.MEDIUM -> listOf(
         Triple("Foco de Praga", "Gafanhotos a 50km", RiskLevel.MEDIUM)
