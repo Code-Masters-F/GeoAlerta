@@ -359,3 +359,27 @@ components:
       properties:
         status: { type: integer, format: int32, example: 404 }
         erro: { type: string, example: 'Alerta 99 nao encontrado' }
+
+    Health:
+      type: object
+      required: [aplicacao, versao, bancoDeDados]
+      properties:
+        aplicacao: { type: string, example: GeoAlerta API }
+        versao: { type: string, example: 1.0.0 }
+        bancoDeDados:
+          type: string
+          description: '"conectado" ou "indisponivel: <motivo>"'
+          example: conectado
+        recursos:
+          type: object
+          additionalProperties: { type: string }
+          example:
+            alertas: /alertas
+            empresas: /empresas
+            sensores: /sensores
+        documentacao:
+          type: object
+          additionalProperties: { type: string }
+          example:
+            swaggerUI: /geoalerta-api/swagger.html
+            openapi: /geoalerta-api/openapi.yaml
