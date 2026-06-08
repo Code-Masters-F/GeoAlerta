@@ -31,13 +31,14 @@ public class HealthController extends BaseServlet {
         body.put("aplicacao", "GeoAlerta API");
         body.put("versao", "1.0.0");
         body.put("bancoDeDados", testarBanco());
+        String ctx = req.getContextPath();
         body.put("recursos", Map.of(
-                "alertas", "/alertas",
-                "empresas", "/empresas",
-                "sensores", "/sensores"));
+                "alertas", ctx + "/alertas",
+                "empresas", ctx + "/empresas",
+                "sensores", ctx + "/sensores"));
         body.put("documentacao", Map.of(
-                "swaggerUI", "/geoalerta-api/swagger.html",
-                "openapi", "/geoalerta-api/openapi.yaml"));
+                "swaggerUI", ctx + "/swagger.html",
+                "openapi", ctx + "/openapi.yaml"));
         JsonUtil.write(resp, 200, body);
     }
 
