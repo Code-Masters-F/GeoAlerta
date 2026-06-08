@@ -1,10 +1,10 @@
 # GeoAlerta API
 
 API RESTful que serve de ponte entre o aplicativo mobile (`android-app/`) e o
-banco de dados PostgreSQL descrito em [`docs/database-design`](../docs/database-design).
+banco de dados descrito em [`docs/database-design`](../docs/database-design).
 
-Construída **sem frameworks "pesados"** (sem Spring): apenas **Servlets (Jakarta)**,
-**Maven**, **JDBC** com **padrão DAO** e **PostgreSQL**, rodando em **Tomcat 10.1+**.
+Construída **sem frameworks** (Spring): apenas **Servlets (Jakarta)**,
+**Maven**, **JDBC** com **padrão DAO**, rodando em **Tomcat 10.1+**.
 
 ## Arquitetura (MVC em camadas)
 
@@ -65,6 +65,35 @@ Respostas de erro seguem o formato `{"status": <int>, "erro": "<mensagem>"}`
 { "tipo": "Estacao meteorologica", "erdPlusCode": "588MC9X8+5R",
   "status": "ATIVO", "dataInstalacao": "2025-11-05T09:00:00" }
 ```
+
+## Documentação interativa (Swagger / OpenAPI)
+
+A API é descrita por um único contrato **OpenAPI 3.0** em
+[`src/main/webapp/openapi.yaml`](src/main/webapp/openapi.yaml), servido junto
+com a aplicação. A partir dele você tem **Swagger UI** e **Postman** sem manter
+documentação duplicada.
+
+Com a aplicação rodando:
+
+| Recurso             | URL                                                  |
+|---------------------|------------------------------------------------------|
+| **Swagger UI**      | <http://localhost:8080/geoalerta-api/swagger.html>   |
+| Contrato OpenAPI    | <http://localhost:8080/geoalerta-api/openapi.yaml>   |
+
+No Swagger UI dá para ler todos os endpoints, schemas e exemplos, e usar o
+botão **Try it out** para disparar requisições reais contra a API.
+
+> O Swagger UI carrega seus assets via CDN (precisa de internet). O contrato
+> `openapi.yaml` em si funciona offline.
+
+### Importar no Postman
+
+1. Postman → **Import** → arraste o arquivo `backend/src/main/webapp/openapi.yaml`
+   (ou cole a URL `http://localhost:8080/geoalerta-api/openapi.yaml`).
+2. O Postman gera automaticamente uma **Collection** com todas as rotas e
+   exemplos de corpo.
+3. Defina a variável de ambiente da collection `baseUrl` como
+   `http://localhost:8080/geoalerta-api`.
 
 ## Configuração do banco
 

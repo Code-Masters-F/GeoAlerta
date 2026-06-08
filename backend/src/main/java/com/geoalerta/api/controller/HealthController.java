@@ -14,11 +14,15 @@ import java.util.Map;
  * Endpoint de saude/raiz. Util para validar o deploy e a conexao com o banco.
  *
  * <pre>
- *   GET /            descricao da API e lista de recursos
+ *   GET /            descricao da API, recursos e links da documentacao
  *   GET /health      status da aplicacao e do banco de dados
  * </pre>
+ *
+ * <p>Mapeado apenas na raiz exata ({@code ""}) e em {@code /health} — sem o
+ * padrao {@code "/"} — para que o Tomcat continue servindo os arquivos
+ * estaticos da documentacao ({@code swagger.html}, {@code openapi.yaml}).
  */
-@WebServlet(name = "HealthController", urlPatterns = {"", "/", "/health"})
+@WebServlet(name = "HealthController", urlPatterns = {"", "/health"})
 public class HealthController extends BaseServlet {
 
     @Override
@@ -31,6 +35,9 @@ public class HealthController extends BaseServlet {
                 "alertas", "/alertas",
                 "empresas", "/empresas",
                 "sensores", "/sensores"));
+        body.put("documentacao", Map.of(
+                "swaggerUI", "/geoalerta-api/swagger.html",
+                "openapi", "/geoalerta-api/openapi.yaml"));
         JsonUtil.write(resp, 200, body);
     }
 

@@ -1,0 +1,361 @@
+openapi: 3.0.3
+info:
+  title: GeoAlerta API
+  version: 1.0.0
+  description: >
+    API RESTful da plataforma GeoAlerta — ponte entre o app mobile e o banco
+    PostgreSQL. Construída com Servlets (Jakarta) + JDBC (padrão DAO), sem
+    frameworks pesados. Os campos JSON usam `camelCase`.
+servers:
+  - url: /geoalerta-api
+    description: Caminho de contexto padrão (mesma origem do deploy)
+  - url: http://localhost:8080/geoalerta-api
+    description: Desenvolvimento (Tomcat embarcado via `mvn cargo:run`)
+
+tags:
+  - name: Saúde
+  - name: Alertas
+  - name: Empresas
+  - name: Sensores
+
+paths:
+  /health:
+    get:
+      tags: [Saúde]
+      summary: Status da API e do banco de dados
+      responses:
+        '200':
+          description: Aplicação no ar
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Health' }
+
+  /alertas:
+    get:
+      tags: [Alertas]
+      summary: Lista todos os alertas
+      responses:
+        '200':
+          description: Lista de alertas
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Alerta' }
+    post:
+      tags: [Alertas]
+      summary: Cria um alerta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AlertaInput' }
+            example:
+              nome: Tempestade Severa Litoral Sul
+              tipo: Problemas climáticos
+              grauGravidade: Alta
+              dataDeEmissao: '2026-05-10T06:30:00'
+              descricao: Ventos acima de 90 km/h e risco de alagamentos.
+      responses:
+        '201':
+          description: Alerta criado
+          headers:
+            Location:
+              description: URI do recurso criado
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Alerta' }
+        '400': { $ref: '#/components/responses/Erro400' }
+
+  /alertas/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Alertas]
+      summary: Busca um alerta por id
+      responses:
+        '200':
+          description: Alerta encontrado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Alerta' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    put:
+      tags: [Alertas]
+      summary: Atualiza um alerta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AlertaInput' }
+      responses:
+        '200':
+          description: Alerta atualizado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Alerta' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    delete:
+      tags: [Alertas]
+      summary: Remove um alerta
+      responses:
+        '204': { description: Removido com sucesso }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+
+  /empresas:
+    get:
+      tags: [Empresas]
+      summary: Lista todas as empresas
+      responses:
+        '200':
+          description: Lista de empresas
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Empresa' }
+    post:
+      tags: [Empresas]
+      summary: Cadastra uma empresa
+      description: >
+        A `senha` é convertida em hash (SHA-256) antes de persistir e nunca é
+        devolvida nas respostas. O CNPJ pode ser enviado com máscara.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EmpresaInput' }
+            example:
+              cnpj: '11.222.333/0001-81'
+              nomeFantasia: Fazenda São João
+              email: contato@fazendasaojoao.com.br
+              senha: segredo123
+      responses:
+        '201':
+          description: Empresa criada
+          headers:
+            Location:
+              description: URI do recurso criado
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Empresa' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '409': { $ref: '#/components/responses/Erro409' }
+
+  /empresas/{cnpj}:
+    parameters:
+      - name: cnpj
+        in: path
+        required: true
+        description: CNPJ (14 dígitos)
+        schema: { type: string, example: '11222333000181' }
+    get:
+      tags: [Empresas]
+      summary: Busca uma empresa por CNPJ
+      responses:
+        '200':
+          description: Empresa encontrada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Empresa' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    put:
+      tags: [Empresas]
+      summary: Atualiza uma empresa
+      description: >
+        Informe `senha` apenas se quiser trocá-la; quando omitida, a senha
+        atual é mantida.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EmpresaInput' }
+      responses:
+        '200':
+          description: Empresa atualizada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Empresa' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    delete:
+      tags: [Empresas]
+      summary: Remove uma empresa
+      responses:
+        '204': { description: Removido com sucesso }
+        '404': { $ref: '#/components/responses/Erro404' }
+
+  /sensores:
+    get:
+      tags: [Sensores]
+      summary: Lista todos os sensores
+      responses:
+        '200':
+          description: Lista de sensores
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Sensor' }
+    post:
+      tags: [Sensores]
+      summary: Cadastra um sensor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SensorInput' }
+            example:
+              tipo: Estacao meteorologica
+              erdPlusCode: 588MC9X8+5R
+              status: ATIVO
+              dataInstalacao: '2025-11-05T09:00:00'
+      responses:
+        '201':
+          description: Sensor criado
+          headers:
+            Location:
+              description: URI do recurso criado
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Sensor' }
+        '400': { $ref: '#/components/responses/Erro400' }
+
+  /sensores/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Sensores]
+      summary: Busca um sensor por id
+      responses:
+        '200':
+          description: Sensor encontrado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Sensor' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    put:
+      tags: [Sensores]
+      summary: Atualiza um sensor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SensorInput' }
+      responses:
+        '200':
+          description: Sensor atualizado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Sensor' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    delete:
+      tags: [Sensores]
+      summary: Remove um sensor
+      responses:
+        '204': { description: Removido com sucesso }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+
+components:
+  parameters:
+    IdPath:
+      name: id
+      in: path
+      required: true
+      description: Identificador numérico
+      schema: { type: integer, format: int32, example: 1 }
+
+  responses:
+    Erro400:
+      description: Requisição inválida (validação)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Erro' }
+          example: { status: 400, erro: "O campo 'nome' e obrigatorio" }
+    Erro404:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Erro' }
+          example: { status: 404, erro: 'Alerta 99 nao encontrado' }
+    Erro409:
+      description: Conflito (recurso já existe)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Erro' }
+          example: { status: 409, erro: 'Ja existe empresa com o CNPJ 11222333000181' }
+
+  schemas:
+    Alerta:
+      type: object
+      properties:
+        id: { type: integer, format: int32, readOnly: true, example: 1 }
+        nome: { type: string, maxLength: 60, example: Tempestade Severa Litoral Sul }
+        tipo: { type: string, maxLength: 30, example: Problemas climáticos }
+        grauGravidade: { type: string, maxLength: 20, example: Alta }
+        dataDeEmissao:
+          type: string
+          format: date-time
+          description: Data/hora ISO-8601 (padrão = agora, se omitida)
+          example: '2026-05-10T06:30:00'
+        descricao: { type: string, nullable: true, example: Ventos acima de 90 km/h. }
+    AlertaInput:
+      type: object
+      required: [nome, tipo, grauGravidade]
+      properties:
+        nome: { type: string, maxLength: 60 }
+        tipo: { type: string, maxLength: 30 }
+        grauGravidade: { type: string, maxLength: 20 }
+        dataDeEmissao: { type: string, format: date-time }
+        descricao: { type: string, nullable: true }
+
+    Empresa:
+      type: object
+      description: Representação de saída — nunca inclui a senha/hash.
+      properties:
+        cnpj: { type: string, example: '11222333000181' }
+        nomeFantasia: { type: string, maxLength: 60, example: Fazenda São João }
+        email: { type: string, format: email, maxLength: 255, example: contato@fazendasaojoao.com.br }
+    EmpresaInput:
+      type: object
+      required: [cnpj, nomeFantasia, email, senha]
+      properties:
+        cnpj: { type: string, description: '14 dígitos (aceita máscara)', example: '11.222.333/0001-81' }
+        nomeFantasia: { type: string, maxLength: 60 }
+        email: { type: string, format: email, maxLength: 255 }
+        senha: { type: string, minLength: 6, writeOnly: true }
+
+    Sensor:
+      type: object
+      properties:
+        id: { type: integer, format: int32, readOnly: true, example: 1 }
+        tipo: { type: string, maxLength: 30, example: Estacao meteorologica }
+        erdPlusCode: { type: string, maxLength: 11, example: 588MC9X8+5R }
+        status:
+          type: string
+          enum: [ATIVO, SUSPENSO, DESATIVADO]
+          example: ATIVO
+        dataInstalacao: { type: string, format: date-time, example: '2025-11-05T09:00:00' }
+    SensorInput:
+      type: object
+      required: [tipo, erdPlusCode, status]
+      properties:
+        tipo: { type: string, maxLength: 30 }
+        erdPlusCode: { type: string, maxLength: 11 }
+        status: { type: string, enum: [ATIVO, SUSPENSO, DESATIVADO] }
+        dataInstalacao: { type: string, format: date-time }
+
+    Erro:
+      type: object
+      properties:
+        status: { type: integer, format: int32, example: 404 }
+        erro: { type: string, example: 'Alerta 99 nao encontrado' }
