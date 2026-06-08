@@ -68,13 +68,25 @@ Respostas de erro seguem o formato `{"status": <int>, "erro": "<mensagem>"}`
 
 ## Configuração do banco
 
-As credenciais são lidas de variáveis de ambiente (com padrões para um Postgres local):
+A configuração é resolvida nesta ordem de precedência: **variável de ambiente
+→ propriedade de sistema (`-Dchave=valor`) → arquivo `.env` → padrão**.
 
 | Variável                | Padrão                                         |
 |-------------------------|------------------------------------------------|
 | `GEOALERTA_DB_URL`      | `jdbc:postgresql://localhost:5432/postgres`    |
 | `GEOALERTA_DB_USER`     | `postgres`                                     |
 | `GEOALERTA_DB_PASSWORD` | `postgres`                                     |
+
+A forma mais simples é copiar o modelo e ajustar os valores (o `.env` não é
+versionado):
+
+```bash
+cd backend
+cp .env.example .env      # edite .env com os dados do seu banco
+```
+
+O `.env` é procurado a partir do diretório de execução, subindo alguns níveis;
+também é possível apontar um caminho específico com `GEOALERTA_ENV_FILE`.
 
 Crie o schema e os dados de exemplo a partir de `docs/database-design`:
 

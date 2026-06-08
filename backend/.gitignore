@@ -10,3 +10,6 @@ target/
 
 # Cargo (Tomcat embarcado baixado em tempo de execucao)
 .cargo/
+
+# Variaveis de ambiente locais (use .env.example como modelo)
+.env

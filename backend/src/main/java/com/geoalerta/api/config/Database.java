@@ -7,7 +7,8 @@ import java.sql.SQLException;
 /**
  * Fabrica de conexoes JDBC com o PostgreSQL.
  *
- * <p>As credenciais sao lidas de variaveis de ambiente, com valores padrao
+ * <p>As credenciais sao resolvidas por {@link Env} (variavel de ambiente,
+ * propriedade de sistema ou arquivo {@code .env}), com valores padrao
  * apontando para um PostgreSQL local. Assim a mesma aplicacao roda tanto
  * localmente quanto contra o banco do Supabase apenas trocando o ambiente:
  *
@@ -16,15 +17,17 @@ import java.sql.SQLException;
  *   GEOALERTA_DB_USER      (ex.: postgres)
  *   GEOALERTA_DB_PASSWORD  (ex.: postgres)
  * </pre>
+ *
+ * Veja {@code .env.example} na raiz do modulo backend.
  */
 public final class Database {
 
     private static final String URL =
-            env("GEOALERTA_DB_URL", "jdbc:postgresql://localhost:5432/postgres");
+            Env.get("GEOALERTA_DB_URL", "jdbc:postgresql://localhost:5432/postgres");
     private static final String USER =
-            env("GEOALERTA_DB_USER", "postgres");
+            Env.get("GEOALERTA_DB_USER", "postgres");
     private static final String PASSWORD =
-            env("GEOALERTA_DB_PASSWORD", "postgres");
+            Env.get("GEOALERTA_DB_PASSWORD", "postgres");
 
     static {
         try {
@@ -46,10 +49,5 @@ public final class Database {
      */
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
-    }
-
-    private static String env(String key, String fallback) {
-        String value = System.getenv(key);
-        return (value == null || value.isBlank()) ? fallback : value;
     }
 }
