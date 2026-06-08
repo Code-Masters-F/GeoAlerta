@@ -174,7 +174,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/EmpresaInput' }
+            schema: { $ref: '#/components/schemas/EmpresaUpdate' }
       responses:
         '200':
           description: Empresa atualizada
@@ -327,9 +327,20 @@ components:
         email: { type: string, format: email, maxLength: 255, example: contato@fazendasaojoao.com.br }
     EmpresaInput:
       type: object
+      description: Corpo de criação (POST). Todos os campos são obrigatórios.
       required: [cnpj, nomeFantasia, email, senha]
       properties:
         cnpj: { type: string, description: '14 dígitos (aceita máscara)', example: '11.222.333/0001-81' }
+        nomeFantasia: { type: string, maxLength: 60 }
+        email: { type: string, format: email, maxLength: 255 }
+        senha: { type: string, minLength: 6, writeOnly: true }
+    EmpresaUpdate:
+      type: object
+      description: >
+        Corpo de atualização (PUT). O CNPJ vem na URL (ignorado no corpo) e a
+        senha é opcional — quando omitida, a senha atual é mantida.
+      required: [nomeFantasia, email]
+      properties:
         nomeFantasia: { type: string, maxLength: 60 }
         email: { type: string, format: email, maxLength: 255 }
         senha: { type: string, minLength: 6, writeOnly: true }
