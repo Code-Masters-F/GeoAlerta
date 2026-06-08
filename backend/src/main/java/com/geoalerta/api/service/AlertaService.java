@@ -43,8 +43,15 @@ public class AlertaService {
     }
 
     public Alerta atualizar(int id, Alerta alerta) {
-        validar(alerta);
+        validarCampos(alerta);
         try {
+            if (alerta.getDataDeEmissao() == null) {
+                // Cliente nao enviou a data: preserva a data de emissao original
+                // em vez de sobrescreve-la com "agora".
+                Alerta existente = repository.findById(id)
+                        .orElseThrow(() -> ApiException.notFound("Alerta " + id + " nao encontrado"));
+                alerta.setDataDeEmissao(existente.getDataDeEmissao());
+            }
             if (!repository.update(id, alerta)) {
                 throw ApiException.notFound("Alerta " + id + " nao encontrado");
             }
@@ -65,16 +72,22 @@ public class AlertaService {
         }
     }
 
+    /** Validacao para criacao: aplica os defaults (data de emissao = agora). */
     private void validar(Alerta a) {
+        validarCampos(a);
+        if (a.getDataDeEmissao() == null) {
+            a.setDataDeEmissao(LocalDateTime.now());
+        }
+    }
+
+    /** Valida apenas os campos obrigatorios, sem definir defaults. */
+    private void validarCampos(Alerta a) {
         if (a == null) {
             throw ApiException.badRequest("Corpo da requisicao ausente");
         }
         exigirTexto(a.getNome(), "nome", 60);
         exigirTexto(a.getTipo(), "tipo", 30);
         exigirTexto(a.getGrauGravidade(), "grauGravidade", 20);
-        if (a.getDataDeEmissao() == null) {
-            a.setDataDeEmissao(LocalDateTime.now());
-        }
     }
 
     private void exigirTexto(String valor, String campo, int max) {
