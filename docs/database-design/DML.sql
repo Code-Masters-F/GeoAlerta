@@ -54,7 +54,7 @@ INSERT INTO Enderecos (CNPJ, ERD_PlusCode) VALUES
     ('12345678000199', '584PXMR5+2J'),
     ('98765432000110', '6FR5C2H8+WW');
 
-INSERT INTO RegioesAfetadas (Alertas_ID, ERD_PlusCode) VALUES
+INSERT INTO RegioesAfetadas (Alerta_ID, ERD_PlusCode) VALUES
     ((SELECT ID FROM Alertas WHERE Nome = 'Tempestade Severa Litoral Sul'), '588MC9X8+'),
     ((SELECT ID FROM Alertas WHERE Nome = 'Tempestade Severa Litoral Sul'), '588MC900+'),
     ((SELECT ID FROM Alertas WHERE Nome = 'Enchente Bacia do Rio Doce'),    '58GR2J00+'),

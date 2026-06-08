@@ -49,13 +49,13 @@ ORDER BY qtd_fazendas DESC;
 -- 9. Regiões afetadas por cada alerta
 SELECT a.Nome AS alerta, r.ERD_PlusCode
 FROM RegioesAfetadas r
-JOIN Alertas a ON a.ID = r.Alertas_ID
+JOIN Alertas a ON a.ID = r.Alerta_ID
 ORDER BY a.Nome;
 
 -- 10. Quantidade de regiões afetadas por alerta
 SELECT a.Nome AS alerta, COUNT(r.ID) AS qtd_regioes
 FROM Alertas a
-LEFT JOIN RegioesAfetadas r ON r.Alertas_ID = a.ID
+LEFT JOIN RegioesAfetadas r ON r.Alerta_ID = a.ID
 GROUP BY a.ID, a.Nome
 ORDER BY qtd_regioes DESC;
 

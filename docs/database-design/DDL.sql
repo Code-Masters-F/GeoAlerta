@@ -52,10 +52,10 @@ CREATE TABLE Enderecos (
 
 CREATE TABLE RegioesAfetadas (
     ID            INT         GENERATED ALWAYS AS IDENTITY,
-    Alertas_ID    INT         NOT NULL,
+    Alerta_ID     INT         NOT NULL,
     ERD_PlusCode  VARCHAR(11) NOT NULL,
     CONSTRAINT pk_regioes_afetadas PRIMARY KEY (ID),
-    CONSTRAINT fk_regioes_alerta FOREIGN KEY (Alertas_ID)
+    CONSTRAINT fk_regioes_alerta FOREIGN KEY (Alerta_ID)
         REFERENCES Alertas (ID)
 );
 
