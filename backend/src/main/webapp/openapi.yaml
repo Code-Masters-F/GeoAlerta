@@ -17,6 +17,7 @@ tags:
   - name: Alertas
   - name: Empresas
   - name: Sensores
+  - name: Leituras
 
 paths:
   /health:
@@ -106,6 +107,148 @@ paths:
         '400': { $ref: '#/components/responses/Erro400' }
         '404': { $ref: '#/components/responses/Erro404' }
 
+  /alertas/{id}/leituras:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Alertas]
+      summary: Lista as leituras que originaram o alerta
+      description: >
+        Leituras de sensores associadas ao alerta pela tabela de junção
+        `sensoresalerta`.
+      responses:
+        '200':
+          description: Leituras vinculadas ao alerta
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Leitura' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    post:
+      tags: [Alertas]
+      summary: Vincula leitura(s) ao alerta
+      description: >
+        Associa ao alerta as leituras que o ocasionaram. Envie um único
+        `leituraId` ou uma lista `leituraIds`. Operação idempotente: vínculos
+        já existentes são ignorados.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VinculoLeituraInput' }
+            example:
+              leituraIds: [1, 2, 3]
+      responses:
+        '201':
+          description: Leituras vinculadas
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Leitura' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+
+  /alertas/{id}/leituras/{leituraId}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+      - name: leituraId
+        in: path
+        required: true
+        description: Id da leitura a desvincular
+        schema: { type: integer, format: int32, example: 1 }
+    delete:
+      tags: [Alertas]
+      summary: Desvincula uma leitura do alerta
+      responses:
+        '204': { description: Vínculo removido }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+
+  /alertas/{id}/regioes:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Alertas]
+      summary: Lista as regiões afetadas pelo alerta
+      responses:
+        '200':
+          description: Regiões afetadas
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Regiao' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    post:
+      tags: [Alertas]
+      summary: Adiciona uma região afetada ao alerta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegiaoInput' }
+            example:
+              erdPlusCode: 588MC9X8+5R
+      responses:
+        '201':
+          description: Região adicionada
+          headers:
+            Location:
+              description: URI do recurso criado
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Regiao' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+
+  /alertas/{id}/regioes/{regiaoId}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+      - name: regiaoId
+        in: path
+        required: true
+        description: Id da região afetada
+        schema: { type: integer, format: int32, example: 1 }
+    get:
+      tags: [Alertas]
+      summary: Busca uma região afetada
+      responses:
+        '200':
+          description: Região encontrada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Regiao' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    put:
+      tags: [Alertas]
+      summary: Atualiza uma região afetada
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegiaoInput' }
+      responses:
+        '200':
+          description: Região atualizada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Regiao' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    delete:
+      tags: [Alertas]
+      summary: Remove uma região afetada
+      responses:
+        '204': { description: Removida com sucesso }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+
   /empresas:
     get:
       tags: [Empresas]
@@ -190,6 +333,160 @@ paths:
         '204': { description: Removido com sucesso }
         '404': { $ref: '#/components/responses/Erro404' }
 
+  /empresas/{cnpj}/notificacoes:
+    parameters:
+      - name: cnpj
+        in: path
+        required: true
+        description: CNPJ (14 dígitos)
+        schema: { type: string, example: '11222333000181' }
+    get:
+      tags: [Empresas]
+      summary: Lista os alertas notificados à empresa
+      description: >
+        Alertas associados à empresa pela tabela de junção
+        `notificacoesrecebidas`.
+      responses:
+        '200':
+          description: Alertas notificados à empresa
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Alerta' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    post:
+      tags: [Empresas]
+      summary: Registra notificação de alerta(s) à empresa
+      description: >
+        Marca os alertas como recebidos pela empresa. Envie um único `alertaId`
+        ou uma lista `alertaIds`. Operação idempotente: vínculos já existentes
+        são ignorados.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VinculoAlertaInput' }
+            example:
+              alertaIds: [1, 2, 3]
+      responses:
+        '201':
+          description: Notificações registradas
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Alerta' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+
+  /empresas/{cnpj}/notificacoes/{alertaId}:
+    parameters:
+      - name: cnpj
+        in: path
+        required: true
+        description: CNPJ (14 dígitos)
+        schema: { type: string, example: '11222333000181' }
+      - name: alertaId
+        in: path
+        required: true
+        description: Id do alerta cuja notificação será removida
+        schema: { type: integer, format: int32, example: 1 }
+    delete:
+      tags: [Empresas]
+      summary: Remove a notificação de um alerta da empresa
+      responses:
+        '204': { description: Notificação removida }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+
+  /empresas/{cnpj}/enderecos:
+    parameters:
+      - name: cnpj
+        in: path
+        required: true
+        description: CNPJ (14 dígitos)
+        schema: { type: string, example: '11222333000181' }
+    get:
+      tags: [Empresas]
+      summary: Lista os endereços da empresa
+      responses:
+        '200':
+          description: Endereços da empresa
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Endereco' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    post:
+      tags: [Empresas]
+      summary: Adiciona um endereço à empresa
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EnderecoInput' }
+            example:
+              erdPlusCode: 588MC9X8+5R
+      responses:
+        '201':
+          description: Endereço adicionado
+          headers:
+            Location:
+              description: URI do recurso criado
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Endereco' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+
+  /empresas/{cnpj}/enderecos/{id}:
+    parameters:
+      - name: cnpj
+        in: path
+        required: true
+        description: CNPJ (14 dígitos)
+        schema: { type: string, example: '11222333000181' }
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Empresas]
+      summary: Busca um endereço da empresa
+      responses:
+        '200':
+          description: Endereço encontrado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Endereco' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    put:
+      tags: [Empresas]
+      summary: Atualiza um endereço da empresa
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EnderecoInput' }
+      responses:
+        '200':
+          description: Endereço atualizado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Endereco' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    delete:
+      tags: [Empresas]
+      summary: Remove um endereço da empresa
+      responses:
+        '204': { description: Removido com sucesso }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+
   /sensores:
     get:
       tags: [Sensores]
@@ -260,6 +557,91 @@ paths:
     delete:
       tags: [Sensores]
       summary: Remove um sensor
+      responses:
+        '204': { description: Removido com sucesso }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+
+  /leituras:
+    get:
+      tags: [Leituras]
+      summary: Lista todas as leituras
+      parameters:
+        - name: sensorId
+          in: query
+          required: false
+          description: Filtra as leituras de um sensor específico
+          schema: { type: integer, format: int32, example: 1 }
+      responses:
+        '200':
+          description: Lista de leituras
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Leitura' }
+        '400': { $ref: '#/components/responses/Erro400' }
+    post:
+      tags: [Leituras]
+      summary: Registra uma leitura
+      description: >
+        O `sensorId` deve referenciar um sensor existente. `dataHora` assume o
+        instante atual quando omitida.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LeituraInput' }
+            example:
+              sensorId: 1
+              valor: 23.45
+              unidadeMedida: °C
+              dataHora: '2025-11-05T09:15:00'
+      responses:
+        '201':
+          description: Leitura registrada
+          headers:
+            Location:
+              description: URI do recurso criado
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Leitura' }
+        '400': { $ref: '#/components/responses/Erro400' }
+
+  /leituras/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Leituras]
+      summary: Busca uma leitura por id
+      responses:
+        '200':
+          description: Leitura encontrada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Leitura' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    put:
+      tags: [Leituras]
+      summary: Atualiza uma leitura
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LeituraInput' }
+      responses:
+        '200':
+          description: Leitura atualizada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Leitura' }
+        '400': { $ref: '#/components/responses/Erro400' }
+        '404': { $ref: '#/components/responses/Erro404' }
+    delete:
+      tags: [Leituras]
+      summary: Remove uma leitura
       responses:
         '204': { description: Removido com sucesso }
         '400': { $ref: '#/components/responses/Erro400' }
@@ -365,6 +747,73 @@ components:
         status: { type: string, enum: [ATIVO, SUSPENSO, DESATIVADO] }
         dataInstalacao: { type: string, format: date-time }
 
+    Leitura:
+      type: object
+      properties:
+        id: { type: integer, format: int32, readOnly: true, example: 1 }
+        sensorId: { type: integer, format: int32, description: Sensor que originou a leitura, example: 1 }
+        valor: { type: number, description: 'Valor medido (DECIMAL(10,5))', example: 23.45 }
+        unidadeMedida: { type: string, maxLength: 5, example: °C }
+        dataHora: { type: string, format: date-time, example: '2025-11-05T09:15:00' }
+    LeituraInput:
+      type: object
+      required: [sensorId, valor, unidadeMedida]
+      properties:
+        sensorId: { type: integer, format: int32, description: Deve referenciar um sensor existente }
+        valor: { type: number }
+        unidadeMedida: { type: string, maxLength: 5 }
+        dataHora: { type: string, format: date-time }
+
+    VinculoLeituraInput:
+      type: object
+      description: >
+        Vínculo de leituras a um alerta. Informe `leituraId` (único) e/ou
+        `leituraIds` (lista) — ao menos um é obrigatório.
+      properties:
+        leituraId: { type: integer, format: int32, example: 1 }
+        leituraIds:
+          type: array
+          items: { type: integer, format: int32 }
+          example: [1, 2, 3]
+
+    Endereco:
+      type: object
+      properties:
+        id: { type: integer, format: int32, readOnly: true, example: 1 }
+        cnpj: { type: string, readOnly: true, example: '11222333000181' }
+        erdPlusCode: { type: string, maxLength: 11, example: 588MC9X8+5R }
+    EnderecoInput:
+      type: object
+      description: O CNPJ vem na URL; o corpo carrega apenas o Plus Code.
+      required: [erdPlusCode]
+      properties:
+        erdPlusCode: { type: string, maxLength: 11 }
+
+    Regiao:
+      type: object
+      properties:
+        id: { type: integer, format: int32, readOnly: true, example: 1 }
+        alertaId: { type: integer, format: int32, readOnly: true, example: 1 }
+        erdPlusCode: { type: string, maxLength: 11, example: 588MC9X8+5R }
+    RegiaoInput:
+      type: object
+      description: O id do alerta vem na URL; o corpo carrega apenas o Plus Code.
+      required: [erdPlusCode]
+      properties:
+        erdPlusCode: { type: string, maxLength: 11 }
+
+    VinculoAlertaInput:
+      type: object
+      description: >
+        Notificação de alertas a uma empresa. Informe `alertaId` (único) e/ou
+        `alertaIds` (lista) — ao menos um é obrigatório.
+      properties:
+        alertaId: { type: integer, format: int32, example: 1 }
+        alertaIds:
+          type: array
+          items: { type: integer, format: int32 }
+          example: [1, 2, 3]
+
     Erro:
       type: object
       properties:
@@ -388,6 +837,7 @@ components:
             alertas: /alertas
             empresas: /empresas
             sensores: /sensores
+            leituras: /leituras
         documentacao:
           type: object
           additionalProperties: { type: string }

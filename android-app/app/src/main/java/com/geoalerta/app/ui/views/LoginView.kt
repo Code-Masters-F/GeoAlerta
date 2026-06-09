@@ -14,6 +14,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.geoalerta.app.R
+import com.geoalerta.app.auth.AuthRepository
+import com.geoalerta.app.auth.InputValidator
 
 @Composable
 fun LoginView(navController: NavController) {
@@ -52,7 +54,10 @@ fun LoginView(navController: NavController) {
 
         OutlinedTextField(
             value = cnpj,
-            onValueChange = { cnpj = it },
+            // Sanitização na origem: só aceita dígitos e máscara, até 18 chars.
+            onValueChange = { novo ->
+                cnpj = novo.filter { it.isDigit() || it in "./-" }.take(18)
+            },
             label = { Text("CNPJ da empresa") },
             placeholder = { Text("00.000.000/0001-00") },
             modifier = Modifier.fillMaxWidth(),
@@ -63,7 +68,7 @@ fun LoginView(navController: NavController) {
 
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = { password = it.take(InputValidator.TAMANHO_MAX_CAMPO) },
             label = { Text("Senha") },
             placeholder = { Text("••••••••") },
             modifier = Modifier.fillMaxWidth(),
@@ -92,9 +97,17 @@ fun LoginView(navController: NavController) {
                 if (cnpj.isBlank() || password.isBlank()) {
                     errorMessage = "Preencha CNPJ e Senha."
                 } else {
-                    errorMessage = null
-                    navController.navigate("dashboard") {
-                        popUpTo("login") { inclusive = true }
+                    // Valida o CNPJ e confere a senha contra o hash armazenado.
+                    when (val resultado = AuthRepository.login(cnpj, password)) {
+                        is AuthRepository.AuthResult.Sucesso -> {
+                            errorMessage = null
+                            navController.navigate("dashboard") {
+                                popUpTo("login") { inclusive = true }
+                            }
+                        }
+                        is AuthRepository.AuthResult.Erro -> {
+                            errorMessage = resultado.mensagem
+                        }
                     }
                 }
             },
@@ -110,5 +123,13 @@ fun LoginView(navController: NavController) {
         TextButton(onClick = { navController.navigate("cadastro") }) {
             Text("Ainda não tem conta? Cadastrar empresa")
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Conta demo: CNPJ 12.345.678/0001-95 · senha GeoAlerta2026",
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }

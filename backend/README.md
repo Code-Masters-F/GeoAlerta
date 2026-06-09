@@ -162,6 +162,88 @@ psql postgresql://postgres:postgres@localhost:5432/postgres -f ../docs/database-
 psql postgresql://postgres:postgres@localhost:5432/postgres -f ../docs/database-design/DML.sql
 ```
 
+## Plano de Testes
+
+O plano cobre **testes manuais** da API (via `curl`, Swagger UI ou Postman) e o
+**teste automatizado** já existente no app Android. Última execução completa:
+**09/06/2026** — todos os casos aprovados.
+
+**Pré-condições** (para os casos CT-01 a CT-08):
+
+1. PostgreSQL no ar com `DDL.sql` e `DML.sql` carregados (seção
+   [Configuração do banco](#configuração-do-banco));
+2. API rodando em `http://localhost:8080/geoalerta-api` (`mvn cargo:run`).
+
+### Casos de teste
+
+| ID | Cenário | Entrada | Saída esperada | Status |
+|----|---------|---------|----------------|--------|
+| CT-01 | Health check com banco conectado | `GET /health` | `200` com `"bancoDeDados": "conectado"` | ✅ Aprovado |
+| CT-02 | Listar alertas da carga inicial | `GET /alertas` | `200` com array JSON contendo os alertas do `DML.sql` | ✅ Aprovado |
+| CT-03 | Criar alerta válido | `POST /alertas` com `{"nome": "Tempestade Litoral", "tipo": "Problemas climáticos", "grauGravidade": "Alta", "descricao": "Ventos acima de 90 km/h."}` | `201` com o alerta criado, `id` gerado e `dataDeEmissao` preenchida automaticamente | ✅ Aprovado |
+| CT-04 | Rejeitar alerta sem campo obrigatório | `POST /alertas` com `{"tipo": "Problemas climáticos", "grauGravidade": "Alta"}` (sem `nome`) | `400` com `{"status": 400, "erro": "O campo 'nome' e obrigatorio"}` | ✅ Aprovado |
+| CT-05 | Buscar alerta inexistente | `GET /alertas/9999` | `404` com `{"status": 404, "erro": "Alerta 9999 nao encontrado"}` | ✅ Aprovado |
+| CT-06 | Cadastrar empresa válida | `POST /empresas` com `{"cnpj": "48.724.117/0001-90", "nomeFantasia": "Sitio Boa Vista", "email": "sitio@boavista.com.br", "senha": "segredo123"}` | `201` com CNPJ normalizado (só dígitos) e **sem** a senha/hash no corpo da resposta | ✅ Aprovado |
+| CT-07 | Rejeitar CNPJ duplicado | Repetir o `POST /empresas` de CT-06 (ou usar o CNPJ `11.222.333/0001-81`, que já vem no `DML.sql`) | `409` com `{"status": 409, "erro": "Ja existe empresa com o CNPJ <cnpj>"}` | ✅ Aprovado |
+| CT-08 | Rejeitar senha fraca | `POST /empresas` com senha `"123"` | `400` com `{"status": 400, "erro": "A senha deve ter ao menos 6 caracteres"}` | ✅ Aprovado |
+| CT-09 | Validação de entrada do app (automatizado) | `./gradlew :app:testDebugUnitTest` em `android-app/` (roda o `InputValidatorTest`: CNPJ, e-mail, força de senha e sanitização) | `BUILD SUCCESSFUL` — 7 testes, 0 falhas | ✅ Aprovado |
+
+> Massa criada pelos testes (alerta de CT-03 e empresa de CT-06) pode ser
+> removida com `DELETE /alertas/{id}` e `DELETE /empresas/48724117000190`,
+> deixando o banco no estado original.
+
+### Como executar (passo a passo de 3 casos)
+
+Com as pré-condições atendidas, os comandos abaixo são repetíveis e não exigem
+preparação de massa. O `-w "\nHTTP %{http_code}\n"` imprime o status HTTP para
+comparação com a saída esperada.
+
+**CT-01 — Health check:**
+
+```bash
+curl -s -w "\nHTTP %{http_code}\n" http://localhost:8080/geoalerta-api/health
+# Esperado: HTTP 200 e "bancoDeDados":"conectado"
+```
+
+**CT-04 — Validação de campo obrigatório:**
+
+```bash
+curl -s -w "\nHTTP %{http_code}\n" -X POST http://localhost:8080/geoalerta-api/alertas \
+  -H 'Content-Type: application/json' \
+  -d '{"tipo": "Problemas climáticos", "grauGravidade": "Alta"}'
+# Esperado: HTTP 400 e {"erro":"O campo 'nome' e obrigatorio","status":400}
+```
+
+**CT-05 — Recurso inexistente:**
+
+```bash
+curl -s -w "\nHTTP %{http_code}\n" http://localhost:8080/geoalerta-api/alertas/9999
+# Esperado: HTTP 404 e {"erro":"Alerta 9999 nao encontrado","status":404}
+```
+
+**CT-09 — Teste automatizado do app (bônus):**
+
+```bash
+cd android-app
+./gradlew :app:testDebugUnitTest
+# Esperado: BUILD SUCCESSFUL (7 testes, 0 falhas)
+```
+
+Os mesmos casos manuais podem ser executados pelo **Swagger UI** (botão *Try it
+out* em <http://localhost:8080/geoalerta-api/swagger.html>) ou pelo **Postman**
+(importando o `openapi.yaml`, como descrito acima).
+
+### Onde coletar os resultados
+
+| Fonte | O que fornece |
+|-------|---------------|
+| Saída do `curl` no terminal | Corpo JSON da resposta + código HTTP (com `-w "%{http_code}"`) para comparar com a saída esperada |
+| Swagger UI (*Try it out*) | Código de status, corpo e headers de cada requisição na própria página |
+| Postman (Collection Runner) | Histórico de execução e relatório exportável (JSON) da collection gerada pelo `openapi.yaml` |
+| Console do `mvn cargo:run` | Logs do Tomcat/aplicação, incluindo stack traces de erros 500 |
+| `android-app/app/build/reports/tests/testDebugUnitTest/index.html` | Relatório HTML do JUnit (CT-09), com cada teste, tempo e taxa de sucesso |
+| `android-app/app/build/test-results/testDebugUnitTest/*.xml` | Resultados em XML (JUnit), úteis para integração com CI | 
+
 ## Integração com o app Android
 
 O app (`android-app/`) hoje usa um `MockRepository`. Para consumir esta API basta

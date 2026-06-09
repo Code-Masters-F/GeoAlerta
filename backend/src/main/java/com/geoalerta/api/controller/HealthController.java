@@ -35,7 +35,8 @@ public class HealthController extends BaseServlet {
         body.put("recursos", Map.of(
                 "alertas", ctx + "/alertas",
                 "empresas", ctx + "/empresas",
-                "sensores", ctx + "/sensores"));
+                "sensores", ctx + "/sensores",
+                "leituras", ctx + "/leituras"));
         body.put("documentacao", Map.of(
                 "swaggerUI", ctx + "/swagger.html",
                 "openapi", ctx + "/openapi.yaml"));

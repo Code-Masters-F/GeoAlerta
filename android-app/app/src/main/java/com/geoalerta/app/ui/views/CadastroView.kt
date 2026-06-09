@@ -19,9 +19,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.geoalerta.app.R
+import com.geoalerta.app.auth.AuthRepository
+import com.geoalerta.app.auth.InputValidator
 /**
  * Cadastro de empresa. Espelha `CadastroPage.jsx`: formulário com nome, CNPJ,
  * e-mail, senha e confirmação, aceite de termos e submit que leva ao dashboard.
+ * A validação dos campos e o hash da senha ficam em `auth/` (AuthRepository).
  */
 @Composable
 fun CadastroView(navController: NavController) {
@@ -69,7 +72,7 @@ fun CadastroView(navController: NavController) {
 
         OutlinedTextField(
             value = nome,
-            onValueChange = { nome = it },
+            onValueChange = { nome = it.take(InputValidator.TAMANHO_MAX_CAMPO) },
             label = { Text("Nome da Empresa") },
             placeholder = { Text("GeoAlerta S/A") },
             modifier = Modifier.fillMaxWidth(),
@@ -77,7 +80,10 @@ fun CadastroView(navController: NavController) {
         )
         OutlinedTextField(
             value = cnpj,
-            onValueChange = { cnpj = it },
+            // Sanitização na origem: só aceita dígitos e máscara, até 18 chars.
+            onValueChange = { novo ->
+                cnpj = novo.filter { it.isDigit() || it in "./-" }.take(18)
+            },
             label = { Text("CNPJ da Empresa") },
             placeholder = { Text("00.000.000/0000-00") },
             modifier = Modifier.fillMaxWidth(),
@@ -85,7 +91,7 @@ fun CadastroView(navController: NavController) {
         )
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { email = it.take(InputValidator.TAMANHO_MAX_CAMPO) },
             label = { Text("E-mail Corporativo") },
             placeholder = { Text("contato@empresa.com") },
             modifier = Modifier.fillMaxWidth(),
@@ -93,9 +99,12 @@ fun CadastroView(navController: NavController) {
         )
         OutlinedTextField(
             value = senha,
-            onValueChange = { senha = it },
+            onValueChange = { senha = it.take(InputValidator.TAMANHO_MAX_CAMPO) },
             label = { Text("Senha") },
             placeholder = { Text("••••••••") },
+            supportingText = {
+                Text("Mínimo de 8 caracteres, com maiúscula, minúscula e número.")
+            },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             visualTransformation = if (mostrarSenha) VisualTransformation.None else PasswordVisualTransformation(),
@@ -107,7 +116,7 @@ fun CadastroView(navController: NavController) {
         )
         OutlinedTextField(
             value = confirmar,
-            onValueChange = { confirmar = it },
+            onValueChange = { confirmar = it.take(InputValidator.TAMANHO_MAX_CAMPO) },
             label = { Text("Confirmar Senha") },
             placeholder = { Text("••••••••") },
             modifier = Modifier.fillMaxWidth(),
@@ -136,14 +145,23 @@ fun CadastroView(navController: NavController) {
 
         Button(
             onClick = {
-                if (nome.isBlank() || email.isBlank() || senha.isBlank()) {
+                if (nome.isBlank() || cnpj.isBlank() || email.isBlank() || senha.isBlank()) {
                     errorMessage = "Preencha todos os campos obrigatórios."
                 } else if (senha != confirmar) {
                     errorMessage = "As senhas não coincidem."
                 } else {
-                    errorMessage = null
-                    navController.navigate("dashboard") {
-                        popUpTo("login") { inclusive = true }
+                    // Valida nome/CNPJ/e-mail/força da senha e armazena
+                    // apenas o hash (PBKDF2 + salt) da senha.
+                    when (val resultado = AuthRepository.cadastrar(nome, cnpj, email, senha)) {
+                        is AuthRepository.AuthResult.Sucesso -> {
+                            errorMessage = null
+                            navController.navigate("dashboard") {
+                                popUpTo("login") { inclusive = true }
+                            }
+                        }
+                        is AuthRepository.AuthResult.Erro -> {
+                            errorMessage = resultado.mensagem
+                        }
                     }
                 }
             },
