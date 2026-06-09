@@ -1,12 +1,18 @@
 package com.geoalerta.api.service;
 
+import com.geoalerta.api.model.Alerta;
 import com.geoalerta.api.model.EmpresaAgricola;
 import com.geoalerta.api.model.EmpresaInput;
+import com.geoalerta.api.model.Endereco;
+import com.geoalerta.api.repository.AlertaRepository;
 import com.geoalerta.api.repository.EmpresaRepository;
+import com.geoalerta.api.repository.EnderecoRepository;
+import com.geoalerta.api.repository.NotificacaoRepository;
 import com.geoalerta.api.util.ApiException;
 import com.geoalerta.api.util.Passwords;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,6 +22,9 @@ import java.util.List;
 public class EmpresaService {
 
     private final EmpresaRepository repository = new EmpresaRepository();
+    private final NotificacaoRepository notificacaoRepository = new NotificacaoRepository();
+    private final AlertaRepository alertaRepository = new AlertaRepository();
+    private final EnderecoRepository enderecoRepository = new EnderecoRepository();
 
     public List<EmpresaAgricola> listar() {
         try {
@@ -87,6 +96,155 @@ public class EmpresaService {
     public void remover(String cnpj) {
         try {
             if (!repository.delete(cnpj)) {
+                throw ApiException.notFound("Empresa " + cnpj + " nao encontrada");
+            }
+        } catch (SQLException e) {
+            throw erroBanco(e);
+        }
+    }
+
+    // ----- Notificacoes de alertas recebidas (tabela notificacoesrecebidas) -----
+
+    /** Lista os alertas notificados a empresa. */
+    public List<Alerta> listarNotificacoes(String cnpj) {
+        String c = normalizarCnpj(cnpj);
+        exigirEmpresa(c);
+        try {
+            return notificacaoRepository.findAlertasByEmpresa(c);
+        } catch (SQLException e) {
+            throw erroBanco(e);
+        }
+    }
+
+    /**
+     * Registra a notificacao de um ou mais alertas para a empresa e devolve os
+     * alertas registrados. Vinculos ja existentes sao ignorados (idempotente).
+     */
+    public List<Alerta> registrarNotificacoes(String cnpj, List<Integer> alertaIds) {
+        String c = normalizarCnpj(cnpj);
+        exigirEmpresa(c);
+        if (alertaIds == null || alertaIds.isEmpty()) {
+            throw ApiException.badRequest("Informe 'alertaId' ou 'alertaIds'");
+        }
+        List<Alerta> registrados = new ArrayList<>();
+        try {
+            for (Integer alertaId : alertaIds) {
+                if (alertaId == null) {
+                    throw ApiException.badRequest("Lista de alertas contem id nulo");
+                }
+                Alerta alerta = alertaRepository.findById(alertaId)
+                        .orElseThrow(() -> ApiException.badRequest(
+                                "Alerta " + alertaId + " nao encontrado"));
+                if (!notificacaoRepository.exists(c, alertaId)) {
+                    notificacaoRepository.link(c, alertaId);
+                }
+                registrados.add(alerta);
+            }
+        } catch (SQLException e) {
+            throw erroBanco(e);
+        }
+        return registrados;
+    }
+
+    /** Remove a notificacao de um alerta para a empresa. */
+    public void removerNotificacao(String cnpj, int alertaId) {
+        String c = normalizarCnpj(cnpj);
+        exigirEmpresa(c);
+        try {
+            if (!notificacaoRepository.unlink(c, alertaId)) {
+                throw ApiException.notFound("Alerta " + alertaId
+                        + " nao notificado a empresa " + c);
+            }
+        } catch (SQLException e) {
+            throw erroBanco(e);
+        }
+    }
+
+    // ----- Enderecos da empresa (tabela enderecos) -----
+
+    /** Lista os enderecos da empresa. */
+    public List<Endereco> listarEnderecos(String cnpj) {
+        String c = normalizarCnpj(cnpj);
+        exigirEmpresa(c);
+        try {
+            return enderecoRepository.findByCnpj(c);
+        } catch (SQLException e) {
+            throw erroBanco(e);
+        }
+    }
+
+    /** Busca um endereco da empresa. */
+    public Endereco buscarEndereco(String cnpj, int id) {
+        String c = normalizarCnpj(cnpj);
+        exigirEmpresa(c);
+        try {
+            return enderecoDaEmpresa(c, id);
+        } catch (SQLException e) {
+            throw erroBanco(e);
+        }
+    }
+
+    /** Adiciona um endereco a empresa. */
+    public Endereco adicionarEndereco(String cnpj, Endereco endereco) {
+        String c = normalizarCnpj(cnpj);
+        exigirEmpresa(c);
+        validarEndereco(endereco);
+        endereco.setCnpj(c);
+        try {
+            return enderecoRepository.insert(endereco);
+        } catch (SQLException e) {
+            throw erroBanco(e);
+        }
+    }
+
+    /** Atualiza o Plus Code de um endereco da empresa. */
+    public Endereco atualizarEndereco(String cnpj, int id, Endereco endereco) {
+        String c = normalizarCnpj(cnpj);
+        exigirEmpresa(c);
+        validarEndereco(endereco);
+        try {
+            enderecoDaEmpresa(c, id);
+            enderecoRepository.update(id, endereco);
+            endereco.setId(id);
+            endereco.setCnpj(c);
+            return endereco;
+        } catch (SQLException e) {
+            throw erroBanco(e);
+        }
+    }
+
+    /** Remove um endereco da empresa. */
+    public void removerEndereco(String cnpj, int id) {
+        String c = normalizarCnpj(cnpj);
+        exigirEmpresa(c);
+        try {
+            enderecoDaEmpresa(c, id);
+            enderecoRepository.delete(id);
+        } catch (SQLException e) {
+            throw erroBanco(e);
+        }
+    }
+
+    /** Garante que o endereco existe e pertence a empresa informada. */
+    private Endereco enderecoDaEmpresa(String cnpj, int id) throws SQLException {
+        Endereco endereco = enderecoRepository.findById(id)
+                .orElseThrow(() -> ApiException.notFound("Endereco " + id + " nao encontrado"));
+        if (!cnpj.equals(endereco.getCnpj().trim())) {
+            throw ApiException.notFound("Endereco " + id + " nao pertence a empresa " + cnpj);
+        }
+        return endereco;
+    }
+
+    private void validarEndereco(Endereco endereco) {
+        if (endereco == null) {
+            throw ApiException.badRequest("Corpo da requisicao ausente");
+        }
+        exigirTexto(endereco.getErdPlusCode(), "erdPlusCode", 11);
+    }
+
+    private void exigirEmpresa(String cnpj) {
+        try {
+            if (!repository.exists(cnpj)) {
                 throw ApiException.notFound("Empresa " + cnpj + " nao encontrada");
             }
         } catch (SQLException e) {
