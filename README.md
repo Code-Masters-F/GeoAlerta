@@ -16,6 +16,7 @@ Detalhes específicos de cada parte estão em:
 - App Android → [`android-app/`](android-app/) (arquitetura no fim deste arquivo)
 - API REST → [`backend/README.md`](backend/README.md)
 - Banco de dados → [`docs/database-design/`](docs/database-design)
+- Plano de testes (manuais e automatizados) → [`backend/README.md#plano-de-testes`](backend/README.md#plano-de-testes)
 
 ## Stack
 
