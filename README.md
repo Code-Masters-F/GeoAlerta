@@ -93,6 +93,32 @@ Para gerar o APK: `Build > Build Bundle(s) / APK(s) > Build APK(s)`.
 
 ---
 
+## 🔐 Autenticação e Práticas de Segurança
+
+O app possui **login e cadastro de empresas com senha criptografada**, usando
+dados mockados em memória (sem consumo de API), no pacote
+[`android-app/app/src/main/java/com/geoalerta/app/auth/`](android-app/app/src/main/java/com/geoalerta/app/auth/).
+
+**Conta demo:** CNPJ `12.345.678/0001-95` · senha `GeoAlerta2026`
+
+### Onde cada prática foi implementada
+
+| Prática | Arquivo | Como funciona |
+|---|---|---|
+| **Criptografia de senha (hash + salt)** | [`auth/PasswordHasher.kt`](android-app/app/src/main/java/com/geoalerta/app/auth/PasswordHasher.kt) | As senhas nunca são armazenadas em texto puro. Cada senha vira um hash **PBKDF2 (HMAC-SHA256, 60.000 iterações)** com **salt aleatório de 16 bytes** (`SecureRandom`), guardado no formato `algoritmo$iterações$salt$hash`. O salt garante que senhas iguais gerem hashes diferentes; as iterações encarecem ataques de força bruta. |
+| **Validação de entrada** | [`auth/InputValidator.kt`](android-app/app/src/main/java/com/geoalerta/app/auth/InputValidator.kt) | Antes de autenticar/cadastrar, valida: **CNPJ** (14 dígitos + dígitos verificadores pelo algoritmo oficial módulo 11), **e-mail** (regex), **força da senha** (mínimo 8 caracteres com maiúscula, minúscula e número) e **tamanho máximo** dos campos. |
+| **Proteção contra SQLi/XSS (sanitização)** | [`auth/InputValidator.kt`](android-app/app/src/main/java/com/geoalerta/app/auth/InputValidator.kt) (`textoSeguro`) e nas telas [`ui/views/LoginView.kt`](android-app/app/src/main/java/com/geoalerta/app/ui/views/LoginView.kt) / [`ui/views/CadastroView.kt`](android-app/app/src/main/java/com/geoalerta/app/ui/views/CadastroView.kt) | Campos de texto livre rejeitam caracteres típicos de payloads de injeção (`<`, `>`, `'`, `"`, `;`, `` ` ``, `\`, `--`); o campo de CNPJ filtra a entrada na origem, aceitando só dígitos e máscara. Assim, mesmo quando o app for integrado ao backend, nenhum dado malicioso parte do formulário. |
+| **Verificação em tempo constante + mensagem genérica** | [`auth/PasswordHasher.kt`](android-app/app/src/main/java/com/geoalerta/app/auth/PasswordHasher.kt) e [`auth/AuthRepository.kt`](android-app/app/src/main/java/com/geoalerta/app/auth/AuthRepository.kt) | A comparação do hash usa `MessageDigest.isEqual` (tempo constante, evita *timing attacks*) e o erro de login é genérico ("CNPJ ou senha incorretos"), sem revelar se o CNPJ existe — evita enumeração de contas. |
+
+O armazenamento dos usuários é mockado em
+[`auth/AuthRepository.kt`](android-app/app/src/main/java/com/geoalerta/app/auth/AuthRepository.kt)
+(lista em memória, no mesmo padrão do `MockRepository`). Os testes unitários da
+validação estão em
+[`app/src/test/java/com/geoalerta/app/auth/InputValidatorTest.kt`](android-app/app/src/test/java/com/geoalerta/app/auth/InputValidatorTest.kt)
+(`./gradlew :app:testDebugUnitTest`).
+
+---
+
 ## Arquitetura do App
 
 O projeto Android encontra-se na pasta `android-app/` e possui a seguinte estrutura de pacotes principal:
@@ -100,4 +126,5 @@ O projeto Android encontra-se na pasta `android-app/` e possui a seguinte estrut
 - `com.geoalerta.app.ui.views` — Telas (Views) da aplicação (ex: `LandingView`, `LoginView`, `DashboardView`, `MapView`, `PropertiesView`, etc.).
 - `com.geoalerta.app.ui.components` — Componentes reaproveitáveis de UI (ex: `RiskBar`, `PropertyCard`, `StatCard`, navegação inferior `BottomNavigation`, etc.).
 - `com.geoalerta.app.ui.theme` — Design System: Cores, Tipografia e definições do Material Theme.
+- `com.geoalerta.app.auth` — Autenticação mockada: hash de senha (`PasswordHasher`), validação/sanitização de entrada (`InputValidator`) e repositório de empresas (`AuthRepository`). Ver seção [Autenticação e Práticas de Segurança](#-autenticação-e-práticas-de-segurança).
 - `com.geoalerta.app.models` — Fronteira de dados. Atualmente utiliza um `MockRepository` para devolver dados simulados nas Views (ex: Propriedades, Alertas, Riscos). Quando o backend Java estiver pronto, basta adaptar este repositório para realizar chamadas REST (ex: via Retrofit), sem quebrar a UI.
