@@ -12,12 +12,22 @@ package com.geoalerta.app.auth
  */
 object AuthRepository {
 
+    /** Dados públicos da empresa autenticada — nunca carrega o hash da senha. */
     data class Empresa(
         val nome: String,
         val cnpj: String, // somente dígitos
+        val email: String
+    )
+
+    /** Registro interno com as credenciais; o hash não sai do repositório. */
+    private data class EmpresaRecord(
+        val nome: String,
+        val cnpj: String,
         val email: String,
         val senhaHash: String
-    )
+    ) {
+        fun semCredenciais() = Empresa(nome, cnpj, email)
+    }
 
     sealed class AuthResult {
         data class Sucesso(val empresa: Empresa) : AuthResult()
@@ -25,7 +35,7 @@ object AuthRepository {
     }
 
     private val empresas = mutableListOf(
-        Empresa(
+        EmpresaRecord(
             nome = "Fazendas Reunidas Bela Vista S/A",
             cnpj = "12345678000195",
             email = "contato@belavista.agr.br",
@@ -48,8 +58,9 @@ object AuthRepository {
             return AuthResult.Erro("CNPJ ou senha incorretos.")
         }
 
-        empresaLogada = empresa
-        return AuthResult.Sucesso(empresa)
+        val publica = empresa.semCredenciais()
+        empresaLogada = publica
+        return AuthResult.Sucesso(publica)
     }
 
     fun cadastrar(nome: String, cnpj: String, email: String, senha: String): AuthResult {
@@ -71,15 +82,16 @@ object AuthRepository {
             return AuthResult.Erro("Já existe uma empresa cadastrada com este CNPJ.")
         }
 
-        val empresa = Empresa(
+        val empresa = EmpresaRecord(
             nome = nome.trim(),
             cnpj = cnpjLimpo,
             email = email.trim(),
             senhaHash = PasswordHasher.hash(senha)
         )
         empresas.add(empresa)
-        empresaLogada = empresa
-        return AuthResult.Sucesso(empresa)
+        val publica = empresa.semCredenciais()
+        empresaLogada = publica
+        return AuthResult.Sucesso(publica)
     }
 
     fun logout() {
